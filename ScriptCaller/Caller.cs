@@ -15,10 +15,12 @@ namespace ScriptCaller
             info.Arguments = arguments;
             try
             {
-                using (var p = Process.Start(info))
+                using (var p = new Process())
                 {
-                    if (p == null) return;
-                    Console.WriteLine(p.StandardOutput.ReadToEnd());
+                    p.StartInfo = info;
+                    p.OutputDataReceived += (sender, a) => Console.WriteLine(a.Data);
+                    p.Start();
+                    p.BeginOutputReadLine();
                     p.WaitForExit();
                 }
             }

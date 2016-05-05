@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScriptCaller
+namespace ScriptExecutor
 {
     public class InternalException : Exception
     {

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptExecutor", "ScriptExecutor\ScriptExecutor.csproj", "{8869927D-B7B0-4234-9EF2-5073B8519000}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Script", "Script\Script.csproj", "{8869927D-B7B0-4234-9EF2-5073B8519000}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCaller", "ScriptCaller\ScriptCaller.csproj", "{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptExecutor", "ScriptExecutor\ScriptExecutor.csproj", "{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCallerRef", "ScriptCallerRef\ScriptCallerRef.csproj", "{B4F54232-4C93-4AE6-B7D9-AC3A80A2B78C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCaller", "ScriptCaller\ScriptCaller.csproj", "{B4F54232-4C93-4AE6-B7D9-AC3A80A2B78C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

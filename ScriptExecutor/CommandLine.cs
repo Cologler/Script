@@ -1,6 +1,6 @@
 using System;
 
-namespace ScriptCaller
+namespace ScriptExecutor
 {
     public struct CommandLine
     {

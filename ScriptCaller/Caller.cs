@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace ScriptCallerRef
+namespace ScriptCaller
 {
     public static class Caller
     {

@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptExecutor", "ScriptExecutor\ScriptExecutor.csproj", "{8869927D-B7B0-4234-9EF2-5073B8519000}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCaller", "ScriptCaller\ScriptCaller.csproj", "{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8869927D-B7B0-4234-9EF2-5073B8519000}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8869927D-B7B0-4234-9EF2-5073B8519000}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8869927D-B7B0-4234-9EF2-5073B8519000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

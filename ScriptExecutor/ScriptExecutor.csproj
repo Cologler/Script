@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScriptCallerRef\ScriptCallerRef.csproj">
+      <Project>{b4f54232-4c93-4ae6-b7d9-ac3a80a2b78c}</Project>
+      <Name>ScriptCallerRef</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ScriptCaller\ScriptCaller.csproj">
       <Project>{82f3f2b8-b2a6-41f3-bd3b-6c69dd7b16b9}</Project>
       <Name>ScriptCaller</Name>

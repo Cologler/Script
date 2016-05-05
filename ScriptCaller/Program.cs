@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Text;
+using ScriptCallerRef;
 
 namespace ScriptCaller
 {
@@ -11,69 +11,37 @@ namespace ScriptCaller
         {
             try
             {
-                Call();
+                Call(args[0]);
             }
             catch (InternalException e)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine("input any key to exit.");
-                Console.ReadKey();
+                Console.WriteLine($"error: {e.Message}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Console.WriteLine("input any key to exit.");
-                Console.ReadKey();
             }
         }
 
-        private static void Call()
+        private static void Call(string command)
         {
-            var cmd = CommandLine.Create();
-            var fileName = Path.GetFileNameWithoutExtension(cmd.ExePath);
-            var scriptName = GetScriptName(fileName);
-            CallProcess(scriptName, cmd.Arguments);
-        }
-
-        private static string GetScriptName(string fileName)
-        {
-            var configName = fileName + ".config";
-            if (File.Exists(configName))
+            var cmd = CommandLine.FromCommandLine(Encoding.UTF8.GetString(Convert.FromBase64String(command)));
+            var configName = Path.Combine(ScriptHelper.ScriptsDirectory, Path.ChangeExtension(Path.GetFileName(cmd.ExePath), "config"));
+            if (!File.Exists(configName))
             {
-                var config = ScriptConfig.CreateFromFile(configName);
-                return config.ScriptPath;
+                throw new InternalException("missing script config.");
             }
+            var config = ScriptConfig.CreateFromFile(configName);
 
-            if (Directory.Exists(fileName))
-            {
-                var files = Directory.EnumerateFiles(fileName).ToArray();
-                var dPath =
-                    files.FirstOrDefault(z =>
-                        string.Equals(Path.GetFileNameWithoutExtension(z), fileName,
-                        StringComparison.OrdinalIgnoreCase)) ??
-                    files.FirstOrDefault(z =>
-                        string.Equals(Path.GetFileNameWithoutExtension(z), "main",
-                        StringComparison.OrdinalIgnoreCase));
-                if (dPath != null) return dPath;
-            }
-
-            throw new InternalException("missing script path.");
-        }
-
-        private static void CallProcess(string fileName, string arguments)
-        {
-            var info = new ProcessStartInfo();
-            info.FileName = fileName;
-            info.UseShellExecute = false;
-            info.RedirectStandardOutput = true;
-            info.Arguments = arguments;
             try
             {
-                using (var p = Process.Start(info))
+                if (string.IsNullOrWhiteSpace(config.Executor))
                 {
-                    if (p == null) return;
-                    Console.WriteLine(p.StandardOutput.ReadToEnd());
-                    p.WaitForExit();
+                    Caller.Call(config.ScriptPath, cmd.Arguments);
+                }
+                else
+                {
+                    Caller.Call(config.Executor, $"\"{config.ScriptPath}\" {cmd.Arguments}");
                 }
             }
             catch (FileNotFoundException)

@@ -8,8 +8,11 @@ namespace ScriptCaller
     {
         public string ScriptPath { get; set; }
 
+        public string Executor { get; set; }
+
         public IEnumerable<string> WriteToLines()
         {
+            yield return $"{nameof(this.Executor)}={this.Executor}";
             yield return $"{nameof(this.ScriptPath)}={this.ScriptPath}";
         }
 
@@ -23,6 +26,10 @@ namespace ScriptCaller
             {
                 case nameof(this.ScriptPath):
                     this.ScriptPath = keyValuePair[1];
+                    break;
+
+                case nameof(this.Executor):
+                    this.Executor = keyValuePair[1];
                     break;
             }
         }

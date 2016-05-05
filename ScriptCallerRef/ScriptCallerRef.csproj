@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{82F3F2B8-B2A6-41F3-BD3B-6C69DD7B16B9}</ProjectGuid>
+    <ProjectGuid>{B4F54232-4C93-4AE6-B7D9-AC3A80A2B78C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScriptCaller</RootNamespace>
-    <AssemblyName>ScriptCaller</AssemblyName>
+    <RootNamespace>ScriptCallerRef</RootNamespace>
+    <AssemblyName>ScriptCallerRef</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -42,20 +42,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLine.cs" />
-    <Compile Include="InternalException.cs" />
+    <Compile Include="Caller.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptConfig.cs" />
+    <Compile Include="ScriptHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ScriptCallerRef\ScriptCallerRef.csproj">
-      <Project>{b4f54232-4c93-4ae6-b7d9-ac3a80a2b78c}</Project>
-      <Name>ScriptCallerRef</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

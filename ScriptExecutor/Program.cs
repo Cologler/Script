@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ScriptCaller;
+using ScriptCallerRef;
 
 namespace ScriptExecutor
 {
-    class Program
+    internal class Program
     {
-        const string ScriptsPath = "Scripts";
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
@@ -18,19 +17,15 @@ namespace ScriptExecutor
             }
             catch (InternalException e)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine("input any key to exit.");
-                Console.ReadKey();
+                Console.WriteLine($"error: {e.Message}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Console.WriteLine("input any key to exit.");
-                Console.ReadKey();
             }
         }
 
-        static void Startup(string[] args)
+        private static void Startup(string[] args)
         {
             if (args.Length == 0)
             {
@@ -44,31 +39,7 @@ namespace ScriptExecutor
                     break;
 
                 case "install":
-                    if (args.Length < 2)
-                    {
-                        throw new InternalException("missing script path.");
-                    }
-                    else
-                    {
-                        string scriptPath;
-                        string commandName;
-                        if (args.Length > 2)
-                        {
-                            scriptPath = args[2];
-                            commandName = args[1];
-                            if (commandName.Contains(" ")) throw new InternalException("command cannot contain whitespace.");
-                        }
-                        else
-                        {
-                            scriptPath = args[1];
-                            commandName = Path.GetFileNameWithoutExtension(args[1]);
-                            Debug.Assert(commandName != null);
-                            commandName = commandName.Replace(" ", "-");
-                        }
-                        if (!File.Exists(scriptPath)) throw new InternalException("script was not exists.");
-
-                        Install(scriptPath, commandName);
-                    }
+                    Install(args);
                     break;
 
                 default:
@@ -76,37 +47,86 @@ namespace ScriptExecutor
             }
         }
 
-        static void Init()
+        private static void Init()
         {
-            if (!Directory.Exists(ScriptsPath)) Directory.CreateDirectory(ScriptsPath);
+            if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
 
             var target = EnvironmentVariableTarget.User;
 
             var cmd = CommandLine.Create();
-            var destDir = Path.Combine(Path.GetDirectoryName(cmd.ExePath), ScriptsPath);
             var envVar = Environment.GetEnvironmentVariable("Path", target);
             if (envVar == null)
             {
-                Environment.SetEnvironmentVariable("Path", destDir, target);
-                return;
+                Environment.SetEnvironmentVariable("Path", ScriptHelper.ScriptsDirectory, target);
             }
-            var envVars = envVar.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (envVars.Any(z => string.Equals(z.Trim(), destDir, StringComparison.OrdinalIgnoreCase))) return;
-            envVars.Insert(0, destDir);
-            Environment.SetEnvironmentVariable("Path", string.Join(";", envVars), target);
+            else
+            {
+                var envVars = envVar.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (!envVars.Any(z => string.Equals(z.Trim(), ScriptHelper.ScriptsDirectory, StringComparison.OrdinalIgnoreCase)))
+                {
+                    envVars.Insert(0, ScriptHelper.ScriptsDirectory);
+                    Environment.SetEnvironmentVariable("Path", string.Join(";", envVars), target);
+                }
+            }
+
+            Install("script-executor", new ScriptConfig
+            {
+                ScriptPath = cmd.ExePath
+            }, false);
         }
 
-        static void Install(string scriptPath, string commandName)
+        private static void Install(string[] args)
         {
-            if (!Directory.Exists(ScriptsPath)) Directory.CreateDirectory(ScriptsPath);
-
-            var config = new ScriptConfig
+            if (args.Length == 1)
             {
-                ScriptPath = scriptPath
-            };
+                throw new InternalException("missing script path.");
+            }
+            else
+            {
+                string scriptPath;
+                string commandName;
+                if (args.Length > 2)
+                {
+                    scriptPath = args[2];
+                    commandName = args[1];
+                    if (commandName.Contains(" ")) throw new InternalException("command cannot contain whitespace.");
+                }
+                else
+                {
+                    scriptPath = args[1];
+                    commandName = Path.GetFileNameWithoutExtension(args[1]);
+                    Debug.Assert(commandName != null);
+                    commandName = commandName.Replace(" ", "-");
+                }
+                if (!File.Exists(scriptPath)) throw new InternalException("script was not exists.");
+                var config = new ScriptConfig
+                {
+                    ScriptPath = Path.GetFullPath(scriptPath)
+                };
+                if (scriptPath.ToLower().EndsWith(".py"))
+                {
+                    config.Executor = "python";
+                }
+                Install(commandName, config, true);
+            }
+        }
 
-            config.SaveToFile(Path.Combine(ScriptsPath, commandName + ".config"));
-            File.Copy(nameof(ScriptCaller) + ".exe", Path.Combine(ScriptsPath, commandName + ".exe"));
+        private static void Install(string commandName, ScriptConfig config, bool existsThrow)
+        {
+            if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
+
+            var configFileName = Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".config");
+            if (File.Exists(configFileName))
+            {
+                if (existsThrow) throw new InternalException("command already exists.");
+            }
+            else
+            {
+                config.SaveToFile(configFileName);
+            }
+
+            var caller = Path.Combine(ScriptHelper.EntryDirectory, nameof(ScriptCallerRef) + ".exe");
+            File.Copy(caller, Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".exe"), true);
         }
     }
 }

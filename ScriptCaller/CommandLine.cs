@@ -8,9 +8,10 @@ namespace ScriptCaller
 
         public string Arguments { get; set; }
 
-        public static CommandLine Create()
+        public static CommandLine Create() => FromCommandLine(Environment.CommandLine);
+
+        public static CommandLine FromCommandLine(string cmd)
         {
-            var cmd = Environment.CommandLine;
             string exePath;
             string args;
             if (cmd.StartsWith("\""))

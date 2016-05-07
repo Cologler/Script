@@ -93,17 +93,20 @@ namespace Script
                 else
                 {
                     scriptPath = args[1];
-                    commandName = Path.GetFileNameWithoutExtension(args[1]);
-                    commandName = commandName.Replace(" ", "-");
+                    commandName = (Path.GetFileNameWithoutExtension(args[1]) ?? string.Empty).Replace(" ", "-");
+                    if (commandName.Length == 0) throw new InternalException("can not parse command from file name: empty file name.");
                 }
+
                 if (!File.Exists(scriptPath)) throw new InternalException("script was not exists.");
                 var config = new ScriptConfig
                 {
                     ScriptPath = Path.GetFullPath(scriptPath)
                 };
-                if (scriptPath.ToLower().EndsWith(".py"))
+                if (config.Executor == null)
                 {
-                    config.Executor = "python";
+                    var scriptFormat = scriptPath.ToLower();
+                    if (scriptFormat.EndsWith(".py")) config.Executor = "python";
+                    else if (scriptFormat.EndsWith(".js")) config.Executor = "node";
                 }
                 Install(commandName, config, true);
             }

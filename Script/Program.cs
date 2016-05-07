@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ScriptCaller;
@@ -31,6 +32,8 @@ namespace Script
                 throw new InternalException("missing arguments");
             }
 
+            if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
+
             switch (args[0].ToLower())
             {
                 case "init":
@@ -41,6 +44,14 @@ namespace Script
                     Install(args);
                     break;
 
+                case "list":
+                    List();
+                    break;
+
+                case "uninstall":
+                    Uninstall(args.Skip(1).ToArray());
+                    break;
+
                 default:
                     throw new InternalException("unknown command.");
             }
@@ -48,8 +59,6 @@ namespace Script
 
         private static void Init()
         {
-            if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
-
             var target = EnvironmentVariableTarget.User;
 
             var cmd = CommandLine.Create();
@@ -114,9 +123,7 @@ namespace Script
 
         private static void Install(string commandName, ScriptConfig config, bool existsThrow)
         {
-            if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
-
-            var configFilePath = Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".config");
+            var configFilePath = Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ScriptConfig.ExtensionName);
             if (File.Exists(configFilePath))
             {
                 if (existsThrow) throw new InternalException("command already exists.");
@@ -129,5 +136,38 @@ namespace Script
             var caller = Path.Combine(ScriptHelper.EntryDirectory, nameof(ScriptCaller) + ".exe");
             File.Copy(caller, Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".exe"), true);
         }
+
+        private static void List()
+        {
+            var commandSet = new HashSet<string>();
+            foreach (var file in Directory.EnumerateFiles(ScriptHelper.ScriptsDirectory))
+            {
+                if (file.EndsWith(ScriptConfig.ExtensionName, StringComparison.OrdinalIgnoreCase) ||
+                    file.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    var command = Path.GetFileNameWithoutExtension(file);
+                    if (commandSet.Add(command)) Console.WriteLine("    " + command);
+                }
+            }
+        }
+
+        private static void Uninstall(string[] args)
+        {
+            if (args.Length == 0) throw new InternalException("missing command name.");
+            var command = args[0];
+
+            var caller = GetCallerPath(command);
+            if (File.Exists(caller)) File.Delete(caller);
+
+            var config = GetConfigPath(command);
+            if (!File.Exists(config)) throw new InternalException("command not found");
+            File.Delete(config);
+        }
+
+        private static string GetConfigPath(string command)
+            => Path.Combine(ScriptHelper.ScriptsDirectory, command + ScriptConfig.ExtensionName);
+
+        private static string GetCallerPath(string command)
+            => Path.Combine(ScriptHelper.ScriptsDirectory, command + ".exe");
     }
 }

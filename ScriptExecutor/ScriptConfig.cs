@@ -7,6 +7,8 @@ namespace ScriptExecutor
 {
     public class ScriptConfig
     {
+        public const string ExtensionName = ".config";
+
         public string ScriptId { get; set; }
 
         public string Executor { get; set; }

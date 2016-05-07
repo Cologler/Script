@@ -26,12 +26,14 @@ namespace ScriptExecutor
         private static void Call(string command)
         {
             var cmd = CommandLine.FromCommandLine(Encoding.UTF8.GetString(Convert.FromBase64String(command)));
-            var configName = Path.Combine(ScriptHelper.ScriptsDirectory, Path.ChangeExtension(Path.GetFileName(cmd.ExePath), "config"));
-            if (!File.Exists(configName))
+            var configPath = Path.Combine(ScriptHelper.ScriptsDirectory, Path.ChangeExtension(Path.GetFileName(cmd.ExePath), "config"));
+            if (!File.Exists(configPath)) throw new InternalException("missing script config.");
+            var config = ScriptConfig.CreateFromFile(configPath);
+            if (config.Upgrade())
             {
-                throw new InternalException("missing script config.");
+                File.Delete(configPath);
+                config.SaveToFile(configPath);
             }
-            var config = ScriptConfig.CreateFromFile(configName);
 
             try
             {

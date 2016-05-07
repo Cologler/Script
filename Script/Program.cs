@@ -113,14 +113,14 @@ namespace Script
         {
             if (!Directory.Exists(ScriptHelper.ScriptsDirectory)) Directory.CreateDirectory(ScriptHelper.ScriptsDirectory);
 
-            var configFileName = Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".config");
-            if (File.Exists(configFileName))
+            var configFilePath = Path.Combine(ScriptHelper.ScriptsDirectory, commandName + ".config");
+            if (File.Exists(configFilePath))
             {
                 if (existsThrow) throw new InternalException("command already exists.");
             }
             else
             {
-                config.SaveToFile(configFileName);
+                config.SaveToFile(configFilePath);
             }
 
             var caller = Path.Combine(ScriptHelper.EntryDirectory, nameof(ScriptCaller) + ".exe");

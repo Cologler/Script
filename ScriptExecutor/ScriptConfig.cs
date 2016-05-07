@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,12 +7,15 @@ namespace ScriptExecutor
 {
     public class ScriptConfig
     {
-        public string ScriptPath { get; set; }
+        public string ScriptId { get; set; }
 
         public string Executor { get; set; }
 
+        public string ScriptPath { get; set; }
+
         public IEnumerable<string> WriteToLines()
         {
+            yield return $"{nameof(this.ScriptId)}={this.ScriptId}";
             yield return $"{nameof(this.Executor)}={this.Executor}";
             yield return $"{nameof(this.ScriptPath)}={this.ScriptPath}";
         }
@@ -31,7 +35,22 @@ namespace ScriptExecutor
                 case nameof(this.Executor):
                     this.Executor = keyValuePair[1];
                     break;
+
+                case nameof(this.ScriptId):
+                    this.ScriptId = keyValuePair[1];
+                    break;
             }
+        }
+
+        public bool Upgrade()
+        {
+            var upgrade = false;
+            if (this.ScriptId == null)
+            {
+                this.ScriptId = Guid.NewGuid().ToString().ToUpper();
+                upgrade = true;
+            }
+            return upgrade;
         }
 
         public void SaveToFile(string path) => File.WriteAllLines(path, this.WriteToLines());

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ScriptCaller
 {
@@ -18,9 +19,8 @@ namespace ScriptCaller
                 using (var p = new Process())
                 {
                     p.StartInfo = info;
-                    p.OutputDataReceived += (sender, a) => Console.WriteLine(a.Data);
                     p.Start();
-                    p.BeginOutputReadLine();
+                    BeginReadOutput(p);
                     p.WaitForExit();
                 }
             }
@@ -28,6 +28,26 @@ namespace ScriptCaller
             {
                 Console.WriteLine("unknown command.");
             }
+        }
+
+        public static void BeginReadOutput(Process p)
+        {
+            var reader = p.StandardOutput;
+            Task.Run(() =>
+            {
+                try
+                {
+                    int readed;
+                    while ((readed = reader.Read()) >= 0)
+                    {
+                        Console.Write((char)readed);
+                    }
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            });
         }
     }
 }
